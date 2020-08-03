@@ -7,11 +7,9 @@ export default class UserRepository {
      */
     constructor(pool) {
         this.pool = pool;
-        // this.repository = new UserRepository(pool);
     }
 
     async createUser(user) {
-        console.log(user);
         const str = 'INSERT INTO users(login, name, country, sex, birth, image) ' +
             'VALUES ($1, $2, $3, $4, $5, $6)';
         const res = await query(this.pool, str, [
@@ -25,7 +23,19 @@ export default class UserRepository {
         return user;
     }
 
-    async checkIfLoginExists(login) {
+    async addOwning(login, horseID) {
+        console.log(login)
+        console.log(horseID)
+        const str = 'insert into owners (horse_id, login) values ($1, $2)';
+        const res = await query(this.pool, str, [
+            horseID,
+            login,
+        ]);
+        console.log(res)
+        return 'ok';
+    }
+
+    async doesLoginExist(login) {
         const str = 'select * from users where login = $1';
         const res = await query(this.pool, str, [
             login

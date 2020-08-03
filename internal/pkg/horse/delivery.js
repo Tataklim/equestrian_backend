@@ -21,7 +21,7 @@ export default class HorseDelivery {
             request.body.birth,
             request.body.image,
             request.body.passport_image,
-            request.body.user_login
+            request.body.login
         );
 
         this.horseUseCase.createHorse(horse)
@@ -29,6 +29,9 @@ export default class HorseDelivery {
                 switch (answer.type) {
                     case STATUS.SUCCESS:
                         response.status(201).send(answer.body);
+                        break;
+                    case STATUS.NOT_FOUND:
+                        response.status(404).send(answer.body);
                         break;
                     default:
                         response.status(500);

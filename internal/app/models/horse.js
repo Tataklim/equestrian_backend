@@ -1,4 +1,4 @@
-export const horseModel = (moniker, sex, lear, country, breed, birth, image, passport_image, user_login) => {
+export const horseModel = (moniker, sex, lear, country, breed, birth, image, passport_image, login) => {
     return {
         moniker,
         sex,
@@ -8,6 +8,6 @@ export const horseModel = (moniker, sex, lear, country, breed, birth, image, pas
         birth,
         image,
         passport_image,
-        user_login
+        login
     };
 };

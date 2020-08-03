@@ -21,16 +21,24 @@ export default class HorseRepository {
             horse.birth,
             horse.image,
             horse.passport_image,
-            horse.user_login
+            horse.login
         ]);
         return res;
     }
 
-    async checkIfLoginExists(login) {
-        const str = 'select * from users where login = $1';
-        const res = await query(this.pool, str, [
-            login
-        ]);
-        return res.rowCount !== 0;
+    async checkIfHorseExists(id) {
+        const str = 'select * from horses where id = $1';
+            const res = await query(this.pool, str, [
+                id
+            ]);
+            return res.rowCount !== 0;
     }
+
+    // async checkIfLoginExists(login) {
+    //     const str = 'select * from users where login = $1';
+    //     const res = await query(this.pool, str, [
+    //         login
+    //     ]);
+    //     return res.rowCount !== 0;
+    // }
 }

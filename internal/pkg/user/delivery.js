@@ -40,4 +40,30 @@ export default class UserDelivery {
             });
     }
 
+    addOwning(request, response) {
+        const owning = {
+            login: request.params.login,
+            id: request.params.id
+        };
+        this.userUseCase
+            .addOwning(request.params.login, request.params.id)
+            .then((answer) => {
+                switch (answer.type) {
+                    case STATUS.SUCCESS:
+                        response.status(201).send(answer.body);
+                        break;
+                    case STATUS.NOT_FOUND:
+                        response.status(409).send(answer.body);
+                        break;
+                    default:
+                        response.status(500);
+                        break;
+                }
+            })
+            .catch((error) => {
+                response.status(500);
+            });
+
+    }
+
 }
