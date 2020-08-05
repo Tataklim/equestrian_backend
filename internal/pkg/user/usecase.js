@@ -28,12 +28,32 @@ export default class UserUseCase {
         if (!loginExists) {
             return {type: STATUS.NOT_FOUND, body: 'No user with this login'}
         }
-        const horseExists = await this.horseRepository.checkIfHorseExists(horseID);
-        if (!horseExists) {
+        const horseOwner = await this.horseRepository.checkIfHorseExistsAndGetOwner(horseID);
+        if (horseOwner === undefined) {
             return {type: STATUS.NOT_FOUND, body: 'No horse with this id'}
         }
-        console.log('lolkek');
+        if (horseOwner === login) {
+            return {type: STATUS.DUPLICATION, body: 'It is already users horse'};
+        }
         const res = await this.repository.addOwning(login, horseID);
-        return 'ok';
+        return {type: STATUS.SUCCESS, body: 'Created'};
+    }
+
+    async getHorses(login) {
+        const loginExists = await this.repository.doesLoginExist(login);
+        if (!loginExists) {
+            return {type: STATUS.NOT_FOUND, body: 'No user with this login'}
+        }
+        const res = await this.repository.getHorses(login)
+        return {type: STATUS.SUCCESS, body: res};
+    }
+
+    async getPastHorses(login) {
+        const loginExists = await this.repository.doesLoginExist(login);
+        if (!loginExists) {
+            return {type: STATUS.NOT_FOUND, body: 'No user with this login'}
+        }
+        const res = await this.repository.getHorses(login)
+        return {type: STATUS.SUCCESS, body: res};
     }
 }

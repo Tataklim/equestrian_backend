@@ -28,10 +28,18 @@ export default class HorseRepository {
 
     async checkIfHorseExists(id) {
         const str = 'select * from horses where id = $1';
-            const res = await query(this.pool, str, [
-                id
-            ]);
-            return res.rowCount !== 0;
+        const res = await query(this.pool, str, [
+            id
+        ]);
+        return res.rowCount !== 0;
+    }
+
+    async checkIfHorseExistsAndGetOwner(id) {
+        const str = 'select user_login from horses where id = $1';
+        const res = await query(this.pool, str, [
+            id
+        ]);
+        return res.rows[0]?.user_login;
     }
 
     // async checkIfLoginExists(login) {

@@ -13,7 +13,15 @@ export const router = (app, pool = null) => {
         horseDelivery.createHorse(request, response);
     })
 
-    app.post('/user/:login/horse/:id', (request, response) => {
+    app.post('/user/:login/horse/:id', (request, response) => { // Создание связи "владение"
         userDelivery.addOwning(request, response);
-    });
+    })
+
+    app.get('/user/:login/horses', (request, response) => { // Получение лошадей пользователя
+        userDelivery.getHorses(request, response)
+    })
+
+    app.get('/user/:login/horses/past', (request, response) => { // Получение лошадей пользователя
+        userDelivery.getPastHorses(request, response)
+    })
 }

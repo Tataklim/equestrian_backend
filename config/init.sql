@@ -121,12 +121,19 @@ select *
 from users
 where login = 'dimochka';
 
-create or replace view actor_view as
-SELECT p.primary_name,
-       array_agg(t.primary_title) as famous_titles
-FROM person p
-         JOIN movie t
-              ON t.t_const = any (p.known_for_titles)
-group by primary_name
+-- create or replace view actor_view as
+-- SELECT p.primary_name,
+--        array_agg(t.primary_title) as famous_titles
+-- FROM person p
+--          JOIN movie t
+--               ON t.t_const = any (p.known_for_titles)
+-- group by primary_name
+
+select * from horses left join owners o on horses.id = o.horse_id where o.login='olya' and o.end_owning is not null order by start_owning;
+
+select id,moniker,sex, lear, country, breed, birth, image, passport_image, user_login, o.start_owning from horses inner join owners o on horses.id = o.horse_id where user_login='olya' and o.end_owning is null order by o.start_owning;
+
+select id,moniker,sex, lear, country, breed, birth, image, passport_image, user_login, o.start_owning from horses inner join owners o on horses.id = o.horse_id where o.login='olya' and o.end_owning is not null order by o.end_owning;
+
 
 -- truncate table horses RESTART IDENTITY cascade;

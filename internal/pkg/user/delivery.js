@@ -12,6 +12,7 @@ export default class UserDelivery {
     }
 
     createUser(request, response) {
+        // TODO проверка, стоит ли кука
         const user = userModel(
             request.body.login,
             request.body.name,
@@ -20,12 +21,12 @@ export default class UserDelivery {
             request.body.birth,
             request.body.image,
         );
-
         this.userUseCase.createUser(user)
             .then((answer) => {
                 switch (answer.type) {
                     case STATUS.SUCCESS:
                         response.status(201).send(answer.body);
+                        // TODO установка куки
                         break;
                     case STATUS.DUPLICATION:
                         response.status(409).send(answer.body);
@@ -41,6 +42,7 @@ export default class UserDelivery {
     }
 
     addOwning(request, response) {
+        // TODO проверка куки
         const owning = {
             login: request.params.login,
             id: request.params.id
@@ -53,6 +55,7 @@ export default class UserDelivery {
                         response.status(201).send(answer.body);
                         break;
                     case STATUS.NOT_FOUND:
+                    case STATUS.DUPLICATION:
                         response.status(409).send(answer.body);
                         break;
                     default:
@@ -64,6 +67,44 @@ export default class UserDelivery {
                 response.status(500);
             });
 
+    }
+
+    getHorses(request, response) {
+        // TODO проверка куки
+        const login = request.params.login;
+        this.userUseCase.getHorses(login)
+            .then((answer) => {
+                switch (answer.type) {
+                    case STATUS.SUCCESS:
+                        response.status(200).send(answer.body);
+                        break;
+                    case STATUS.NOT_FOUND:
+                        response.status(409).send(answer.body);
+                        break;
+                    default:
+                        response.status(500);
+                        break;
+                }
+            });
+    }
+
+    getPastHorses(request, response) {
+        // TODO проверка куки
+        const login = request.params.login;
+        this.userUseCase.getPastHorses(login)
+            .then((answer) => {
+                switch (answer.type) {
+                    case STATUS.SUCCESS:
+                        response.status(200).send(answer.body);
+                        break;
+                    case STATUS.NOT_FOUND:
+                        response.status(409).send(answer.body);
+                        break;
+                    default:
+                        response.status(500);
+                        break;
+                }
+            });
     }
 
 }
