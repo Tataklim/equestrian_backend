@@ -22,20 +22,19 @@ export default class UserUseCase {
         return {type: STATUS.SUCCESS, body: creationResult};
     }
 
-    async addOwning(login, horseID) {
-        // TODO добавить проверку на то, владеет ли уже пользователь данной лошадью
+    async addOwning(login, passport) {
         const loginExists = await this.repository.doesLoginExist(login);
         if (!loginExists) {
             return {type: STATUS.NOT_FOUND, body: 'No user with this login'}
         }
-        const horseOwner = await this.horseRepository.checkIfHorseExistsAndGetOwner(horseID);
+        const horseOwner = await this.horseRepository.checkIfHorseExistsAndGetOwner(passport);
         if (horseOwner === undefined) {
             return {type: STATUS.NOT_FOUND, body: 'No horse with this id'}
         }
         if (horseOwner === login) {
             return {type: STATUS.DUPLICATION, body: 'It is already users horse'};
         }
-        const res = await this.repository.addOwning(login, horseID);
+        const res = await this.repository.addOwning(login, passport);
         return {type: STATUS.SUCCESS, body: 'Created'};
     }
 
@@ -44,6 +43,7 @@ export default class UserUseCase {
         if (!loginExists) {
             return {type: STATUS.NOT_FOUND, body: 'No user with this login'}
         }
+        console.log(login);
         const res = await this.repository.getHorses(login)
         return {type: STATUS.SUCCESS, body: res};
     }
@@ -53,7 +53,7 @@ export default class UserUseCase {
         if (!loginExists) {
             return {type: STATUS.NOT_FOUND, body: 'No user with this login'}
         }
-        const res = await this.repository.getHorses(login)
+        const res = await this.repository.getPastHorses(login)
         return {type: STATUS.SUCCESS, body: res};
     }
 }

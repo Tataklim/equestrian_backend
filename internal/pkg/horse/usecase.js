@@ -15,11 +15,24 @@ export default class HorseUseCase {
     async createHorse(horse) {
         const loginExists = await this.userRepository.doesLoginExist(horse.login);
         if (!loginExists) {
-            return {type: STATUS.NOT_FOUND, body: STATUS.NOT_FOUND}
+            return {type: STATUS.NOT_FOUND, body: STATUS.NOT_FOUND};
+        }
+        const horseExists = await this.repository.checkIfHorseExists(horse.passport)
+        if (horseExists) {
+            return {type: STATUS.DUPLICATION, body: STATUS.DUPLICATION};
         }
         // TODO добавить загрузку фоточек на MCS - оттуда получение ссылки на картинку и паспорт
         // TODO подумать - мб сделать уникальным у лошади пару кличка+дата рождения??
         const creationResult = await this.repository.createHorse(horse);
         return {type: STATUS.SUCCESS, body: creationResult};
+    }
+
+    async getOwner(passport) {
+        const horseExists = await this.repository.checkIfHorseExists(passport)
+        if (!horseExists) {
+            return {type: STATUS.NOT_FOUND, body: STATUS.NOT_FOUND};
+        }
+        const res = await this.repository.getOwner(passport);
+        return {type: STATUS.SUCCESS, body: res};
     }
 }

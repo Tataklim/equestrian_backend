@@ -13,6 +13,7 @@ export default class HorseDelivery {
 
     createHorse(request, response) {
         const horse = horseModel(
+            request.body.passport,
             request.body.moniker,
             request.body.sex,
             request.body.lear,
@@ -25,6 +26,30 @@ export default class HorseDelivery {
         );
 
         this.horseUseCase.createHorse(horse)
+            .then((answer) => {
+                switch (answer.type) {
+                    case STATUS.SUCCESS:
+                        response.status(201).send(answer.body);
+                        break;
+                    case STATUS.NOT_FOUND:
+                        response.status(404).send(answer.body);
+                        break;
+                    case STATUS.DUPLICATION:
+                        response.status(409).send(answer.body);
+                        break;
+                    default:
+                        response.status(500);
+                        break;
+                }
+            })
+            .catch((error) => {
+                response.status(500);
+            });
+    }
+
+    getOwner(request, response) {
+        const passport = request.params.passport;
+        this.horseUseCase.getOwner(passport)
             .then((answer) => {
                 switch (answer.type) {
                     case STATUS.SUCCESS:

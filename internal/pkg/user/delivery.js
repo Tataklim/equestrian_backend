@@ -45,10 +45,10 @@ export default class UserDelivery {
         // TODO проверка куки
         const owning = {
             login: request.params.login,
-            id: request.params.id
+            passport: request.params.passport
         };
         this.userUseCase
-            .addOwning(request.params.login, request.params.id)
+            .addOwning(request.params.login, request.params.passport)
             .then((answer) => {
                 switch (answer.type) {
                     case STATUS.SUCCESS:
@@ -66,7 +66,29 @@ export default class UserDelivery {
             .catch((error) => {
                 response.status(500);
             });
+    }
 
+    addTraining(request, response) {
+        // TODO проверка куки
+        this.userUseCase
+            .addTraining(request.params.login, request.params.passport)
+            .then((answer) => {
+                switch (answer.type) {
+                    case STATUS.SUCCESS:
+                        response.status(201).send(answer.body);
+                        break;
+                    case STATUS.NOT_FOUND:
+                    case STATUS.DUPLICATION:
+                        response.status(409).send(answer.body);
+                        break;
+                    default:
+                        response.status(500);
+                        break;
+                }
+            })
+            .catch((error) => {
+                response.status(500);
+            });
     }
 
     getHorses(request, response) {

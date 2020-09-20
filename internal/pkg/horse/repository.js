@@ -1,4 +1,5 @@
-import {query} from "../repository_helper/query.js";
+import {query} from '../repository_helper/query.js';
+import {STATUS} from '../../../config/consts.js';
 
 export default class HorseRepository {
     /**
@@ -10,9 +11,10 @@ export default class HorseRepository {
     }
 
     async createHorse(horse) {
-        const str = 'INSERT INTO horses(moniker, sex, lear, country, breed, birth, image, passport_image, user_login) ' +
-            'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
-        const res = await query(this.pool, str, [
+        const str = 'INSERT INTO horses(passport, moniker, sex, lear, country, breed, birth, image, passport_image, user_login) ' +
+            'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)';
+        await query(this.pool, str, [
+            horse.passport,
             horse.moniker,
             horse.sex,
             horse.lear,
@@ -23,23 +25,32 @@ export default class HorseRepository {
             horse.passport_image,
             horse.login
         ]);
-        return res;
+        return STATUS.SUCCESS;
     }
 
-    async checkIfHorseExists(id) {
-        const str = 'select * from horses where id = $1';
+    async checkIfHorseExists(passport) {
+        const str = 'select * from horses where passport = $1';
         const res = await query(this.pool, str, [
-            id
+            passport
         ]);
         return res.rowCount !== 0;
     }
 
-    async checkIfHorseExistsAndGetOwner(id) {
-        const str = 'select user_login from horses where id = $1';
+    async checkIfHorseExistsAndGetOwner(passport) {
+        const str = 'select user_login from horses where passport = $1';
         const res = await query(this.pool, str, [
-            id
+            passport
         ]);
         return res.rows[0]?.user_login;
+    }
+
+    async getOwner(passport) {
+        const str = `select o.user_login, o.start_owning, u.name, u.country, u.image 
+        from users u inner join owners o on o.horse_passport = $1 where o.user_login = u.login and o.end_owning is null`;
+        const res = await query(this.pool, str, [
+            passport
+        ]);
+        return res.rows;
     }
 
     // async checkIfLoginExists(login) {

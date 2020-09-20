@@ -23,10 +23,10 @@ export default class UserRepository {
         return user;
     }
 
-    async addOwning(login, horseID) {
-        const str = 'insert into owners (horse_id, login) values ($1, $2)';
+    async addOwning(login, passport) {
+        const str = 'insert into owners (horse_passport, user_login) values ($1, $2)';
         const res = await query(this.pool, str, [
-            horseID,
+            passport,
             login,
         ]);
         return 'ok';
@@ -41,9 +41,10 @@ export default class UserRepository {
     }
 
     async getHorses(login) {
-        const str = 'select id,moniker,sex, lear, country, breed, birth, image, passport_image, user_login,' +
-            ' o.start_owning from horses inner join owners o on horses.id = o.horse_id where user_login=$1 ' +
+        const str = 'select passport,moniker,sex, lear, country, breed, birth, image, passport_image, o.user_login,' +
+            ' o.start_owning from horses inner join owners o on horses.passport = o.horse_passport where o.user_login=$1 ' +
             'and o.end_owning is null order by o.start_owning'
+
         const res = await query(this.pool, str, [
             login,
         ]);
@@ -51,9 +52,9 @@ export default class UserRepository {
     }
 
     async getPastHorses(login) {
-        const str = 'select id,moniker,sex, lear, country, breed, birth, image, passport_image, user_login, ' +
-            'o.start_owning from horses inner join owners o on horses.id = o.horse_id where o.login=$1 and ' +
-            'o.end_owning is not null order by o.end_owning'
+        const str = 'select passport,moniker,sex, lear, country, breed, birth, image, passport_image, o.user_login, ' +
+            'o.start_owning from horses inner join owners o on horses.passport = o.horse_passport where o.user_login=$1 and ' +
+            'o.end_owning is not null order by o.start_owning'
         const res = await query(this.pool, str, [
             login,
         ]);
