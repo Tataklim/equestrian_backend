@@ -43,7 +43,6 @@ export default class UserUseCase {
         if (!loginExists) {
             return {type: STATUS.NOT_FOUND, body: 'No user with this login'}
         }
-        console.log(login);
         const res = await this.repository.getHorses(login)
         return {type: STATUS.SUCCESS, body: res};
     }
