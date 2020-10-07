@@ -40,6 +40,23 @@ export default class UserRepository {
         return res.rowCount !== 0;
     }
 
+    async getUser(login) {
+        const str = 'select login, name, image, country, birth, sex from users where login=$1';
+        const res = await query(this.pool, str, [
+            login
+        ]);
+        return res.rows[0];
+    }
+
+    async getUsers(limit, offset) {
+        const str = 'select login, name, image, country from users order by login limit $1 offset $2';
+        const res = await query(this.pool, str, [
+            limit,
+            offset,
+        ]);
+        return res.rows;
+    }
+
     async getHorses(login) {
         const str = 'select passport,moniker,sex, lear, country, breed, birth, image, passport_image, o.user_login,' +
             ' o.start_owning from horses inner join owners o on horses.passport = o.horse_passport where o.user_login=$1 ' +

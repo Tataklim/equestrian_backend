@@ -40,6 +40,45 @@ export default class UserDelivery {
                 response.status(500);
             });
     }
+    getUser(request, response) {
+        const login = request.params.login
+        this.userUseCase.getUser(login)
+            .then((answer) => {
+                switch (answer.type) {
+                    case STATUS.SUCCESS:
+                        response.status(200).send(answer.body);
+                        break;
+                    case STATUS.NOT_FOUND:
+                        response.status(404).send(answer.body);
+                        break;
+                    default:
+                        response.status(500);
+                        break;
+                }
+            })
+            .catch((error) => {
+                response.status(500);
+            });
+    }
+
+    getUsers(request, response) {
+        const start = request.params.start;
+        const end = request.params.end;
+        this.userUseCase.getUsers(start, end)
+            .then((answer) => {
+                switch (answer.type) {
+                    case STATUS.SUCCESS:
+                        response.status(200).send(answer.body);
+                        break;
+                    default:
+                        response.status(500);
+                        break;
+                }
+            })
+            .catch((error) => {
+                response.status(500);
+            });
+    }
 
     addOwning(request, response) {
         // TODO проверка куки

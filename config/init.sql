@@ -32,6 +32,8 @@ CREATE TABLE horses
     FOREIGN KEY (user_login) REFERENCES users (login)
 );
 
+ALTER TABLE horses ALTER passport_image TYPE varchar(200);
+
 CREATE TABLE owners
 (
     horse_passport varchar(20)        NOT NULL,
@@ -173,6 +175,8 @@ where o.user_login = 'olya'
   and o.end_owning is null
 order by o.start_owning;
 
+select passport, moniker, sex, lear, country, breed, birth, image, passport_image from horses where passport='123EG313';
+
 select passport,
        moniker,
        sex,
@@ -196,5 +200,7 @@ from users u inner join owners o on o.horse_passport = '123EG313' where o.user_l
 insert into trains(horse_passport, user_login)
 VALUES ('123EG312', 'olya'),
        ('123EG312', 'dimochka');
+
+select login, name, image, country from users order by login limit 2 offset 2;
 
 -- truncate table horses RESTART IDENTITY cascade;

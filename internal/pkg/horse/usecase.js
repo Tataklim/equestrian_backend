@@ -27,12 +27,29 @@ export default class HorseUseCase {
         return {type: STATUS.SUCCESS, body: creationResult};
     }
 
+    async getHorse(passport) {
+        const horseExists = await this.repository.checkIfHorseExists(passport)
+        if (!horseExists) {
+            return {type: STATUS.NOT_FOUND, body: STATUS.NOT_FOUND};
+        }
+        const res = await this.repository.getHorse(passport);
+        return {type: STATUS.SUCCESS, body: res};
+
+    }
+
     async getOwner(passport) {
         const horseExists = await this.repository.checkIfHorseExists(passport)
         if (!horseExists) {
             return {type: STATUS.NOT_FOUND, body: STATUS.NOT_FOUND};
         }
         const res = await this.repository.getOwner(passport);
+        return {type: STATUS.SUCCESS, body: res};
+    }
+
+    async getHorses(start, end) {
+        const limit = (+end === -1)? 0 : end - start + 1;
+        const offset = start - 1;
+        const res = await this.repository.getHorses(limit, offset);
         return {type: STATUS.SUCCESS, body: res};
     }
 }

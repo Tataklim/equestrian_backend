@@ -53,6 +53,24 @@ export default class HorseRepository {
         return res.rows;
     }
 
+    async getHorses(limit, offset) {
+        const str = 'select passport, moniker, sex, lear, country, breed, birth, image, passport_image ' +
+            'from horses order by passport limit $1 offset $2;';
+        const res = await query(this.pool, str, [
+            limit,
+            offset,
+        ]);
+        return res.rows;
+    }
+
+    async getHorse(passport) {
+        const str = 'select passport, moniker, sex, lear, country, breed, birth, image, passport_image from horses where passport=$1';
+        const res = await query(this.pool, str, [
+            passport
+        ]);
+        return res.rows[0];
+    }
+
     // async checkIfLoginExists(login) {
     //     const str = 'select * from users where login = $1';
     //     const res = await query(this.pool, str, [

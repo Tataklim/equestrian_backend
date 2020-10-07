@@ -55,4 +55,20 @@ export default class UserUseCase {
         const res = await this.repository.getPastHorses(login)
         return {type: STATUS.SUCCESS, body: res};
     }
+
+    async getUsers(start, end) {
+        const limit = (+end === -1)? 0 : end - start + 1;
+        const offset = start - 1;
+        const res = await this.repository.getUsers(limit, offset);
+        return {type: STATUS.SUCCESS, body: res};
+    }
+
+    async getUser(login) {
+        const loginExists = await this.repository.doesLoginExist(login);
+        if (!loginExists) {
+            return {type: STATUS.NOT_FOUND, body: 'No user with this login'}
+        }
+        const res = await this.repository.getUser(login);
+        return {type: STATUS.SUCCESS, body: res};
+    }
 }
