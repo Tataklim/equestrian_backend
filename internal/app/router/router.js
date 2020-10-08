@@ -1,9 +1,11 @@
 import UserDelivery from '../../pkg/user/delivery.js';
-import HorseDelivery from "../../pkg/horse/delivery.js";
+import HorseDelivery from '../../pkg/horse/delivery.js';
+import CompetitionDelivery from '../../pkg/competition/delivery.js';
 
 export const router = (app, pool = null) => {
     const userDelivery = new UserDelivery(pool);
     const horseDelivery = new HorseDelivery(pool);
+    const competitionDelivery = new CompetitionDelivery(pool);
 
     app.post('/horse', (request, response) => { // Создание лошади с привязкой к пользователю +
         horseDelivery.createHorse(request, response);
@@ -37,7 +39,7 @@ export const router = (app, pool = null) => {
         userDelivery.getUser(request, response);
     })
 
-    app.post('/owner/user/:login/horse/:passport', (request, response) => { // Создание связи "владение" +
+    app.post('/owner/user/:login/horse/:passport', (request, response) => { // Создание связи 'владение' +
         userDelivery.addOwning(request, response);
     })
 
@@ -49,7 +51,7 @@ export const router = (app, pool = null) => {
         userDelivery.getPastHorses(request, response)
     })
 
-    app.post('/train/user/:login/horse/:passport', (request, response) => { // Создание связи "тренировка"
+    app.post('/train/user/:login/horse/:passport', (request, response) => { // Создание связи 'тренировка'
         userDelivery.addTraining(request, response);
     })
 
@@ -61,7 +63,19 @@ export const router = (app, pool = null) => {
         horseDelivery.getTraining(request, response);
     })
 
-    // реализовать два запросы
-    // Связать их с фронтом + addTraining тоже
-    // Мур
+    app.post('/competition', (request, response) => { // Создание соревнования
+        competitionDelivery.createCompetition(request, response);
+    })
+
+    app.get('/competition/:name', (request, response) => { // Получение соревнования
+        competitionDelivery.getCompetition(request, response);
+    })
+
+    app.get('/competition/:name/members', (request, response) => { // Получение участников соревнования
+        competitionDelivery.getCompetitionMembers(request, response);
+    })
+
+    app.get('/competitions/:start/:end', (request, response) => { // Получение списка соревнований
+        competitionDelivery.getCompetitionList(request, response);
+    })
 }

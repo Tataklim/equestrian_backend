@@ -91,7 +91,6 @@ export default class HorseDelivery {
 
     getPastOwners(request, response) {
         const passport = request.params.passport;
-        console.log(passport)
         this.horseUseCase.getPastOwners(passport)
             .then((answer) => {
                 switch (answer.type) {

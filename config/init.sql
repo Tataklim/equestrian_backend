@@ -2,6 +2,7 @@ DROP INDEX IF EXISTS past_horse_owners;
 DROP INDEX IF EXISTS actual_horse_owners;
 DROP INDEX IF EXISTS past_users_horses;
 DROP INDEX IF EXISTS actual_users_horses;
+DROP VIEW IF EXISTS competition_members;
 DROP TABLE IF EXISTS owners;
 DROP TABLE IF EXISTS trains;
 DROP TABLE IF EXISTS horses;
@@ -58,7 +59,8 @@ CREATE TABLE trains
 
 CREATE TABLE competitions
 (
-    name  varchar(60)  NOT NULL PRIMARY KEY ,
+    id    SERIAL UNIQUE PRIMARY KEY,
+    name  varchar(60)  NOT NULL UNIQUE,
     image varchar(200) NOT NULL,
     year  int check ( year > 1800 AND year < 2100 )
 );
@@ -74,10 +76,18 @@ CREATE TABLE members
     PRIMARY KEY (horse_passport, user_login, comp_name)
 );
 
+CREATE VIEW competition_members as
+SELECT m.comp_name as comp_name, u.image as user_image, u.login as user_login, u.name as user_name, u.country as user_country, h.passport as horse_passport, h.moniker as horse_moniker, h.country as horse_country, h.lear as horse_lear, h.image as horse_image
+from users u
+         inner join members m on u.login = m.user_login
+         left join horses h on m.horse_passport = h.passport
+         left join competitions c on m.comp_name = c.name;
+
 
 CREATE OR REPLACE FUNCTION add_training_after_comp() RETURNS trigger AS
 $add_owner$
-BEGIN -- если в таблице уже есть - вставлять не нужно
+BEGIN
+    -- если в таблице уже есть - вставлять не нужно
     insert into trains(horse_passport, user_login) values (new.horse_passport, new.user_login);
     RETURN NEW;
 END;
