@@ -50,6 +50,15 @@ export default class HorseRepository {
         const res = await query(this.pool, str, [
             passport
         ]);
+        return res.rows[0];
+    }
+
+    async getPastOwners(passport) {
+        const str = `select o.user_login, o.start_owning, o.end_owning, u.name, u.country, u.image 
+        from users u inner join owners o on o.horse_passport = $1 where o.user_login = u.login and o.end_owning is not null`;
+        const res = await query(this.pool, str, [
+            passport
+        ]);
         return res.rows;
     }
 
@@ -69,6 +78,16 @@ export default class HorseRepository {
             passport
         ]);
         return res.rows[0];
+    }
+
+    async getTraining(passport) {
+        const str = 'select name, country, image, o.user_login ' +
+            'from users  inner join trains o on users.login = o.user_login ' +
+            'where o.horse_passport = $1';
+        const res = await query(this.pool, str, [
+            passport
+        ]);
+        return res.rows;
     }
 
     // async checkIfLoginExists(login) {

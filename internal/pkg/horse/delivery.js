@@ -89,6 +89,28 @@ export default class HorseDelivery {
             });
     }
 
+    getPastOwners(request, response) {
+        const passport = request.params.passport;
+        console.log(passport)
+        this.horseUseCase.getPastOwners(passport)
+            .then((answer) => {
+                switch (answer.type) {
+                    case STATUS.SUCCESS:
+                        response.status(201).send(answer.body);
+                        break;
+                    case STATUS.NOT_FOUND:
+                        response.status(404).send(answer.body);
+                        break;
+                    default:
+                        response.status(500);
+                        break;
+                }
+            })
+            .catch((error) => {
+                response.status(500);
+            });
+    }
+
     getHorses(request, response) {
         const start = request.params.start;
         const end = request.params.end;
@@ -97,6 +119,27 @@ export default class HorseDelivery {
                 switch (answer.type) {
                     case STATUS.SUCCESS:
                         response.status(200).send(answer.body);
+                        break;
+                    default:
+                        response.status(500);
+                        break;
+                }
+            })
+            .catch((error) => {
+                response.status(500);
+            });
+    }
+
+    getTraining(request, response) {
+        this.horseUseCase
+            .getTraining(request.params.passport)
+            .then((answer) => {
+                switch (answer.type) {
+                    case STATUS.SUCCESS:
+                        response.status(201).send(answer.body);
+                        break;
+                    case STATUS.NOT_FOUND:
+                        response.status(404).send(answer.body);
                         break;
                     default:
                         response.status(500);

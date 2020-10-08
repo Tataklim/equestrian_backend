@@ -46,6 +46,24 @@ export default class HorseUseCase {
         return {type: STATUS.SUCCESS, body: res};
     }
 
+    async getTraining(passport) {
+        const horseExists = await this.repository.checkIfHorseExists(passport);
+        if (!horseExists) {
+            return {type: STATUS.NOT_FOUND, body: STATUS.NOT_FOUND}
+        }
+        const res = await this.repository.getTraining(passport)
+        return {type: STATUS.SUCCESS, body: res};
+    }
+
+    async getPastOwners(passport) {
+        const horseExists = await this.repository.checkIfHorseExists(passport)
+        if (!horseExists) {
+            return {type: STATUS.NOT_FOUND, body: STATUS.NOT_FOUND};
+        }
+        const res = await this.repository.getPastOwners(passport);
+        return {type: STATUS.SUCCESS, body: res};
+    }
+
     async getHorses(start, end) {
         const limit = (+end === -1)? 0 : end - start + 1;
         const offset = start - 1;

@@ -117,6 +117,8 @@ export default class UserDelivery {
                         response.status(201).send(answer.body);
                         break;
                     case STATUS.NOT_FOUND:
+                        response.status(404).send(answer.body);
+                        break;
                     case STATUS.DUPLICATION:
                         response.status(409).send(answer.body);
                         break;
@@ -165,6 +167,27 @@ export default class UserDelivery {
                         response.status(500);
                         break;
                 }
+            });
+    }
+
+    getTraining(request, response) {
+        this.userUseCase
+            .getTraining(request.params.login)
+            .then((answer) => {
+                switch (answer.type) {
+                    case STATUS.SUCCESS:
+                        response.status(201).send(answer.body);
+                        break;
+                    case STATUS.NOT_FOUND:
+                        response.status(404).send(answer.body);
+                        break;
+                    default:
+                        response.status(500);
+                        break;
+                }
+            })
+            .catch((error) => {
+                response.status(500);
             });
     }
 

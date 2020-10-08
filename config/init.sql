@@ -6,6 +6,8 @@ DROP TABLE IF EXISTS owners;
 DROP TABLE IF EXISTS trains;
 DROP TABLE IF EXISTS horses;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS competitions;
+DROP TABLE IF EXISTS members;
 
 CREATE TABLE users
 (
@@ -32,7 +34,8 @@ CREATE TABLE horses
     FOREIGN KEY (user_login) REFERENCES users (login)
 );
 
-ALTER TABLE horses ALTER passport_image TYPE varchar(200);
+ALTER TABLE users
+    ALTER image TYPE varchar(300);
 
 CREATE TABLE owners
 (
@@ -50,8 +53,43 @@ CREATE TABLE trains
     user_login     varchar(60) NOT NULL,
     FOREIGN KEY (horse_passport) REFERENCES horses (passport),
     FOREIGN KEY (user_login) REFERENCES users (login),
-    PRIMARY KEY (horse_passport, user_login);
+    PRIMARY KEY (horse_passport, user_login)
 );
+
+CREATE TABLE competitions
+(
+    name  varchar(60)  NOT NULL PRIMARY KEY ,
+    image varchar(200) NOT NULL,
+    year  int check ( year > 1800 AND year < 2100 )
+);
+
+CREATE TABLE members
+(
+    comp_name      varchar(60) NOT NULL,
+    user_login     varchar(60) NOT NULL,
+    horse_passport varchar(20) NOT NULL,
+    FOREIGN KEY (horse_passport) REFERENCES horses (passport),
+    FOREIGN KEY (user_login) REFERENCES users (login),
+    FOREIGN KEY (comp_name) REFERENCES competitions (name),
+    PRIMARY KEY (horse_passport, user_login, comp_name)
+);
+
+
+CREATE OR REPLACE FUNCTION add_training_after_comp() RETURNS trigger AS
+$add_owner$
+BEGIN -- если в таблице уже есть - вставлять не нужно
+    insert into trains(horse_passport, user_login) values (new.horse_passport, new.user_login);
+    RETURN NEW;
+END;
+$add_owner$ LANGUAGE plpgsql;
+
+CREATE TRIGGER add_training_after_comp
+    after insert
+    ON members
+    FOR EACH ROW
+EXECUTE PROCEDURE add_training_after_comp();
+
+
 
 CREATE OR REPLACE FUNCTION add_owner() RETURNS trigger AS
 $add_owner$
@@ -66,6 +104,8 @@ CREATE TRIGGER add_owner
     ON horses
     FOR EACH ROW
 EXECUTE PROCEDURE add_owner();
+
+
 
 CREATE OR REPLACE FUNCTION change_owner_and_set_end_owning() RETURNS trigger AS
 $change_owner_and_set_end_owning$
@@ -84,26 +124,6 @@ CREATE TRIGGER change_owner_and_set_end_owning
     ON owners
     FOR EACH ROW
 EXECUTE PROCEDURE change_owner_and_set_end_owning();
-
-
-CREATE OR REPLACE FUNCTION check_training_duplication() RETURNS triggn-shcher AS
-$check_training_duplication$
-BEGIN
-    select * from trains where horse_passport=NEW.horse_passport and user_login=new.user_login;
-    UPDATE owners
-    set end_owning = new.start_owning
-    where horse_passport = new.horse_passport
-      and end_owning is null;
-    UPDATE horses SET user_login=new.user_login where passport = new.horse_passport;
-    RETURN NEW;
-END;
-$check_training_duplication$ LANGUAGE plpgsql;
-
-CREATE TRIGGER check_training_duplication
-    instead of insert
-    ON trains
-    FOR EACH ROW
-EXECUTE PROCEDURE check_training_duplication();
 
 CREATE INDEX past_horse_owners ON owners (horse_passport) where end_owning IS NOT NULL;
 CREATE INDEX actual_horse_owners ON owners (horse_passport) where end_owning IS NULL;
@@ -175,7 +195,30 @@ where o.user_login = 'olya'
   and o.end_owning is null
 order by o.start_owning;
 
-select passport, moniker, sex, lear, country, breed, birth, image, passport_image from horses where passport='123EG313';
+select passport, country, breed, image, o.user_login
+from horses
+         inner join trains o on horses.passport = o.horse_passport
+where o.user_login = 'dimochka';
+
+select name,
+       country,
+       image,
+       o.user_login
+from users
+         inner join trains o on users.login = o.user_login
+where o.horse_passport = '123EG312';
+
+select passport,
+       moniker,
+       sex,
+       lear,
+       country,
+       breed,
+       birth,
+       image,
+       passport_image
+from horses
+where passport = '123EG313';
 
 select passport,
        moniker,
@@ -195,12 +238,18 @@ where o.user_login = 'olya'
 order by o.end_owning;
 
 select o.user_login, o.start_owning, u.name, u.country, u.image
-from users u inner join owners o on o.horse_passport = '123EG313' where o.user_login = u.login and o.end_owning is null;
+from users u
+         inner join owners o on o.horse_passport = '123EG313'
+where o.user_login = u.login
+  and o.end_owning is null;
 
 insert into trains(horse_passport, user_login)
 VALUES ('123EG312', 'olya'),
        ('123EG312', 'dimochka');
 
-select login, name, image, country from users order by login limit 2 offset 2;
+select login, name, image, country
+from users
+order by login
+limit 2 offset 2;
 
 -- truncate table horses RESTART IDENTITY cascade;
